@@ -239,7 +239,7 @@ const isAuthenticated = (req, res, next) => {
 };
 
 // CRUD operations for teams
-app.get('/api/teams', authenticateToken, (req, res) => {
+app.get('/api/teams', (req, res) => {
     res.json(teams);
 });
 
@@ -266,3 +266,5 @@ app.delete('/api/teams/:id', authenticateToken, (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
