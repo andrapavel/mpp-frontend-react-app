@@ -484,7 +484,13 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/teamsDB', {
+// mongoose.connect('mongodb://localhost:27017/teamsDB', {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// });
+
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
