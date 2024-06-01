@@ -537,8 +537,22 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Register endpoint
+// app.post('/api/register', async (req, res) => {
+//     const {username, password} = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const user = new User({username, password: hashedPassword});
+
+//     try {
+//         await user.save();
+//         res.status(201).json({message: 'User registered successfully'});
+//     } catch (error) {
+//         res.status(400).json({message: 'Registration failed', error});
+//     }
+// });
+
 app.post('/api/register', async (req, res) => {
     const {username, password} = req.body;
+    console.log('Registering user:', username); // Log the username
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({username, password: hashedPassword});
 
@@ -546,7 +560,11 @@ app.post('/api/register', async (req, res) => {
         await user.save();
         res.status(201).json({message: 'User registered successfully'});
     } catch (error) {
-        res.status(400).json({message: 'Registration failed', error});
+        console.error('Registration error:', error); // Log the error with detailed information
+        res.status(400).json({
+            message: 'Registration failed',
+            error: error.message,
+        });
     }
 });
 
@@ -633,6 +651,9 @@ app.delete('/api/teams/:id', authenticateToken, async (req, res) => {
         res.status(500).json({message: 'Failed to delete team', error});
     }
 });
+
+// Export the app for testing
+module.exports = app;
 
 // Start server
 app.listen(PORT, () => {
