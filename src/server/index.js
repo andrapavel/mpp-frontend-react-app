@@ -618,13 +618,82 @@ app.post('/api/teams', authenticateToken, async (req, res) => {
     }
 });
 
+// app.put('/api/teams/:id', authenticateToken, async (req, res) => {
+//     const id = req.params.id;
+
+//     try {
+//         const updatedTeam = await Team.findByIdAndUpdate(id, req.body, {
+//             new: true,
+//         });
+//         res.json(updatedTeam);
+//     } catch (error) {
+//         res.status(500).json({message: 'Failed to update team', error});
+//     }
+// });
+
+// app.delete('/api/teams/:id', authenticateToken, async (req, res) => {
+//     try {
+//         const {id} = req.params;
+
+//         if (!mongoose.Types.ObjectId.isValid(id)) {
+//             return res.status(400).json({message: 'Invalid team ID'});
+//         }
+
+//         const result = await Team.findByIdAndDelete(id);
+
+//         if (!result) {
+//             return res.status(404).json({message: 'Team not found'});
+//         }
+
+//         res.json({message: 'Team deleted successfully'});
+//     } catch (error) {
+//         console.error('Error deleting team:', error);
+//         res.status(500).json({message: 'Failed to delete team', error});
+//     }
+// });
+
+// CRUD operations for teams
+// app.get('/api/teams', authenticateToken, async (req, res) => {
+//     try {
+//         const teams = await Team.find({userId: req.user.id}); // Only fetch teams belonging to the authenticated user
+//         res.json(teams);
+//     } catch (error) {
+//         res.status(500).json({message: 'Failed to fetch teams', error});
+//     }
+// });
+
+// app.post('/api/teams', authenticateToken, async (req, res) => {
+//     const {name, drivers, constructors} = req.body;
+//     const newTeam = new Team({
+//         name,
+//         drivers,
+//         constructors,
+//         userId: req.user.id,
+//     }); // Associate the new team with the authenticated user
+
+//     try {
+//         await newTeam.save();
+//         res.status(201).json(newTeam);
+//     } catch (error) {
+//         res.status(500).json({message: 'Failed to add team', error});
+//     }
+// });
+
 app.put('/api/teams/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
+    const {name, drivers, constructors} = req.body;
 
     try {
-        const updatedTeam = await Team.findByIdAndUpdate(id, req.body, {
-            new: true,
-        });
+        const updatedTeam = await Team.findOneAndUpdate(
+            {_id: id, userId: req.user.id}, // Only update teams belonging to the authenticated user
+            {name, drivers, constructors},
+            {new: true},
+        );
+
+        if (!updatedTeam) {
+            return res.status(404).json({message: 'Team not found'});
+        }
+
         res.json(updatedTeam);
     } catch (error) {
         res.status(500).json({message: 'Failed to update team', error});
@@ -632,22 +701,20 @@ app.put('/api/teams/:id', authenticateToken, async (req, res) => {
 });
 
 app.delete('/api/teams/:id', authenticateToken, async (req, res) => {
+    const id = req.params.id;
+
     try {
-        const {id} = req.params;
+        const deletedTeam = await Team.findOneAndDelete({
+            _id: id,
+            userId: req.user.id,
+        }); // Only delete teams belonging to the authenticated user
 
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({message: 'Invalid team ID'});
-        }
-
-        const result = await Team.findByIdAndDelete(id);
-
-        if (!result) {
+        if (!deletedTeam) {
             return res.status(404).json({message: 'Team not found'});
         }
 
         res.json({message: 'Team deleted successfully'});
     } catch (error) {
-        console.error('Error deleting team:', error);
         res.status(500).json({message: 'Failed to delete team', error});
     }
 });
